@@ -9,6 +9,9 @@
 <meta property="og:title" content="Celestial Observatory | 3D True-Sky 13-Sign Birth Chart">
 <meta property="og:description" content="Enter your birth details and explore your own birth sky in 3D: 13 constellations including Ophiuchus.">
 <meta property="og:type" content="website">
+<meta property="og:image" content="https://lezkt1811-maker.github.io/Celestial-Observatory/og.png">
+<meta property="og:url" content="https://lezkt1811-maker.github.io/Celestial-Observatory/">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#070B14">
 <link rel="icon" type="image/png" href="icon-192.png">
 <script>function sc13GaEvent(){} function sc13GetAttribution(){ return null; }</script>
@@ -1286,6 +1289,31 @@ function obsGenerate(){
   try { _doGenerate(); } catch (e) { console.warn(e.message); return; } /* the engine already shows the message */
   if (window.sc13LastChart && window.sc13LastChart !== before && window.SC13Observatory) SC13Observatory.open();
 }
+/* Share link: carries the birth details so the same chart reopens for whoever taps it. */
+function sc13ObsShareURL(){
+  function v(id){ var e=document.getElementById(id); return e ? String(e.value||"").trim() : ""; }
+  var q = new URLSearchParams();
+  [["n","iName"],["c","cityInput"],["d","iDate"],["t","iTime"],["lat","iLat"],["lon","iLon"],["tz","iTz"]].forEach(function(k){ if(v(k[1])) q.set(k[0], v(k[1])); });
+  return location.origin + location.pathname + "?" + q.toString();
+}
+(function(){
+  var q = new URLSearchParams(location.search);
+  if (!q.get("d") || !q.get("t") || !q.get("lat") || !q.get("lon")) return;
+  function ready(){ var h = document.getElementById("tHour"); return document.readyState === "complete" && window.Astronomy && window.SC13Observatory && typeof setDateUI === "function" && h && h.options.length > 2; }
+  var tries = 0;
+  (function go(){
+    if (!ready()) { if (++tries < 100) setTimeout(go, 100); return; }
+    try {
+      document.getElementById("iName").value = q.get("n") || "";
+      document.getElementById("cityInput").value = q.get("c") || "";
+      setDateUI(q.get("d")); setTimeUI(q.get("t"));
+      document.getElementById("iLat").value = q.get("lat");
+      document.getElementById("iLon").value = q.get("lon");
+      document.getElementById("iTz").value = q.get("tz") || "";
+      obsGenerate();
+    } catch (e) { console.warn("Could not open shared chart", e); }
+  })();
+})();
 </script>
 </body>
 </html>
